@@ -103,9 +103,15 @@ To keep the simulation focused, we will limit the scope to **Admin Activity** an
 
 ### Targeted GCP Services
 To maintain realism while ensuring the dataset remains lightweight and manageable, we will simulate log events only for **commonly used GCP services**, including:
-- **Compute Engine** – to represent infrastructure management actions (e.g., VM creation, deletion).
-- **Cloud Storage** – to emulate object read/write operations.
-- **BigQuery** – to mimic analytical queries and data access events.
+The simulation will emulate audit log activity for a select set of commonly used services that demonstrate realistic patterns of configuration and data access:
+
+| **Service** | **Purpose** | **Example Actions Simulated** |
+|--------------|--------------|--------------------------------|
+| **Compute Engine** | Infrastructure management | `compute.instances.insert`, `compute.instances.delete`, `compute.instances.get` |
+| **BigQuery** | Analytical data operations | `bigquery.jobs.query`, `bigquery.tables.get`, `bigquery.datasets.create` |
+| **Cloud IAM** | Identity and access management | `iam.roles.create`, `iam.serviceAccounts.update`, `setIamPolicy` |
+
+These services collectively cover the most common admin and data-related activities in a Google Cloud environment, providing a realistic yet manageable simulation scope.
 
 ### Simulation Design
 The simulation will generate log events that loosely follow Google Cloud’s [audit log format]([https://cloud.google.com/logging/docs/audit](https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog)) with key fields such as:
