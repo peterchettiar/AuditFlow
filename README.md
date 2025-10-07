@@ -74,3 +74,23 @@ A comprehensive guide for setting up a VM instance on GCP can be found in this [
     - Copy public key from `.ssh` folder and upload it into Github
     - Then git clone the AuditFlow repository.
     - Please note that if you need to install `git` you need to run `sudo apt install -y git` assuming your OS for your VM is "Debian GNU/Linux".
+  
+## 🧾 Dataset: Simulated GCP Audit Logs
+
+This project uses a **synthetic dataset modeled after Google Cloud Platform (GCP) audit logs** as the primary streaming data source. What distinguishes an audit log entry from other log entries is the `protoPayload` field in GCP Log Explorer. These logs emulate real-world cloud activity events that capture administrative operations across GCP services such as IAM, Compute Engine, Cloud Storage, BigQuery, and KMS.
+
+### Google Cloud Audit Log Types
+
+| **Log Type** | **Triggered By** | **Configurable** | **Default State** | **Example Use Case** | **Key Notes** |
+|---------------|------------------|------------------|-------------------|----------------------|----------------|
+| **Admin Activity** | User-driven configuration or metadata changes | ❌ No | ✅ Always enabled | Creating or deleting VM instances, updating IAM permissions | Logs persist even if the Cloud Logging API is disabled |
+| **Data Access** | Read or write operations on resource data or metadata | ✅ Yes | 🚫 Disabled (except BigQuery) | Reading Cloud Storage objects, running BigQuery queries | May generate large log volumes and incur additional costs; doesn’t log public access (`allUsers`, `allAuthenticatedUsers`) |
+| **System Event** | Automatic system actions that modify resource configuration | ❌ No | ✅ Always enabled | Autoscaling adds/removes VMs, system-managed configuration updates | Tracks non-user (system) operations; cannot be disabled |
+| **Policy Denied** | Access requests denied by IAM or organization policy | ⚙️ Excludable (cannot disable) | ✅ Always enabled | User denied access due to missing permissions or policy restrictions | Useful for security monitoring and policy enforcement; storage incurs cost |
+
+### Notes
+- **Admin Activity** and **System Event** logs are *always written* and cannot be disabled.  
+- **Data Access** logs must be *explicitly enabled* per service (except BigQuery).  
+- **Policy Denied** logs are *always generated*, but you can exclude them from storage to reduce costs.  
+- All audit logs can be routed to **BigQuery**, **Pub/Sub**, or **Cloud Storage** for analysis or long-term archiving.
+
