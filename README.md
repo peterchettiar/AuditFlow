@@ -52,3 +52,24 @@ A comprehensive guide for setting up a VM instance on GCP can be found in this [
 	```
     - If you have multiple projects, make sure you change the active GCP project using the `gcloud` CLI - run `gcloud config set project PROJECT_ID`
     - Also, it is worth increasing the boot disk space (default given to me was 10GB, not enough to install anaconda on VM) - run `gcloud compute disks resize audit-flow --size=100GB --zone=asia-southeast1-c` to change the boot disk size from 10GB to 100GB
+    - Now to simply `ssh audit-flow`!
+  
+5. Install Anaconda
+    - Run `wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh` to download anaconda into your VM home directory, after which run `bash Miniconda3-latest-Linux-x86_64.sh` to install anaconda.
+    - Remove the installer after installation.
+  
+6. Uploading google credentials
+    - First we need to go to service accounts page and click on the default compute engine service account, and then create a new key for this service account.
+    - The key is a .json file that would be downloaded into your local downloads folder
+    - What we need to do next is to upload this .json file into a directory in your VM instance. 
+    - The .json file contains credentials allowing programmatic access to GCP services, on behalf of a service account.
+    - Create a folder called .gc in your home directory, and move the .json file there followed by changing directory into the .gc folder - `mkdir ~/.gc | mv ~/Downloads/audit-flow-474406-401e676e7ab0.json . | cd ~/.gc`
+    - Next, from the current working directory run `sftp audit-flow ` to connect to the home directory of the VM instance (make sure you have started instance and have changed the external IP to your config file)
+    - Again, in your home directory of your VM instance, create a `.gc` folder and run sftp command in local home directory`put audit-flow-474406-401e676e7ab0.json .gc/` inside the folder to copy the .json file into this new directory from local machine directory
+    - Now that’s done we can create an environment variable to specify the path to this google credentials .json file for authentication purposes for google cloud services. For that, in `.bashrc`file write `export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/audit-flow-474406-401e676e7ab0.json`
+    - Laslty, run `gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS` to activate the service account credentials.
+  
+7. Clone Github Repository 
+    - Run `ssh-keygen -t ed25519 -C "peterchet2308@outlook.com"` in home directory of VM instance to generate SSH keys for GitHub.
+    - Copy public key from `.ssh` folder and upload it into Github
+    - Then git clone DEZoomcamp repo
