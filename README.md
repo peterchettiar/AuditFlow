@@ -72,4 +72,5 @@ A comprehensive guide for setting up a VM instance on GCP can be found in this [
 7. Clone Github Repository 
     - Run `ssh-keygen -t ed25519 -C "peterchet2308@outlook.com"` in home directory of VM instance to generate SSH keys for GitHub.
     - Copy public key from `.ssh` folder and upload it into Github
-    - Then git clone DEZoomcamp repo
+    - Then git clone the AuditFlow repository.
+    - Please note that if you need to install `git` you need to run `sudo apt install -y git` assuming your OS for your VM is "Debian GNU/Linux".
