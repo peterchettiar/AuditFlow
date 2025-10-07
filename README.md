@@ -88,9 +88,40 @@ This project uses a **synthetic dataset modeled after Google Cloud Platform (GCP
 | **System Event** | Automatic system actions that modify resource configuration | ❌ No | ✅ Always enabled | Autoscaling adds/removes VMs, system-managed configuration updates | Tracks non-user (system) operations; cannot be disabled |
 | **Policy Denied** | Access requests denied by IAM or organization policy | ⚙️ Excludable (cannot disable) | ✅ Always enabled | User denied access due to missing permissions or policy restrictions | Useful for security monitoring and policy enforcement; storage incurs cost |
 
-### Notes
+#### Notes
 - **Admin Activity** and **System Event** logs are *always written* and cannot be disabled.  
 - **Data Access** logs must be *explicitly enabled* per service (except BigQuery).  
 - **Policy Denied** logs are *always generated*, but you can exclude them from storage to reduce costs.  
 - All audit logs can be routed to **BigQuery**, **Pub/Sub**, or **Cloud Storage** for analysis or long-term archiving.
 
+### Scope and Simulation Notes
+
+This project aims to simulate Google Cloud audit logs for the purpose of building, testing, and learning from a real-time data engineering pipeline.  
+Because we are generating synthetic data rather than pulling from a live production environment, fully replicating the depth and variability of real-world audit activity presents several challenges — including user diversity, resource complexity, and inter-service dependencies.  
+
+To keep the simulation focused, we will limit the scope to **Admin Activity** and **Data Access** audit logs, as these two categories most directly reflect user-driven operations and data interactions across GCP services.
+
+### Targeted GCP Services
+To maintain realism while ensuring the dataset remains lightweight and manageable, we will simulate log events only for **commonly used GCP services**, including:
+- **Compute Engine** – to represent infrastructure management actions (e.g., VM creation, deletion).
+- **Cloud Storage** – to emulate object read/write operations.
+- **BigQuery** – to mimic analytical queries and data access events.
+
+### Simulation Design
+The simulation will generate log events that loosely follow Google Cloud’s [audit log format]([https://cloud.google.com/logging/docs/audit](https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog)) with key fields such as:
+- `timestamp` – when the simulated event occurred  
+- `protoPayload.methodName` – API call or action performed  
+- `resource.type` – target GCP service or resource  
+- `severity` – log level (e.g., INFO, NOTICE, WARNING)  
+- `authenticationInfo.principalEmail` – simulated user identity  
+- `requestMetadata.callerIp` – pseudo-randomized IP for contextual realism  
+
+Events will be **streamed into Kafka** to mimic the continuous flow of operational logs from GCP into `BigQuery`.  
+The focus is on creating a realistic data pipeline that enables testing of:
+- **Stream ingestion and transformation**  
+- **Data quality validation and schema enforcement**  
+- **Real-time monitoring and alerting**  
+
+### Purpose
+This simulation is designed purely for **educational and experimental use**.  
+It serves as a safe, controlled environment to learn how to handle real-world cloud audit data — focusing on the engineering aspects of ingestion, transformation, and analysis — without needing access to actual GCP production environments.
