@@ -3,7 +3,7 @@
 
 ### ✨ Tagline
 
-**“Stream. Detect. Protect.”**
+_**“Stream. Detect. Protect.”**_
 
 AuditFlow continuously ingests system and cloud audit logs, identifies unauthorized privileged access, and assigns confidence scores using AI-driven anomaly detection — all in real time.
 
