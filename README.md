@@ -77,7 +77,7 @@ A comprehensive guide for setting up a VM instance on GCP can be found in this [
   
 ## 🧾 Dataset: Simulated GCP Audit Logs
 
-This project uses a **synthetic dataset modeled after Google Cloud Platform (GCP) audit logs** as the primary streaming data source. What distinguishes an audit log entry from other log entries is the `protoPayload` field in GCP Log Explorer. These logs emulate real-world cloud activity events that capture administrative operations across GCP services such as IAM, Compute Engine, Cloud Storage, BigQuery, and KMS.
+This project uses a **synthetic dataset modeled after Google Cloud Platform (GCP) audit logs** as the primary streaming data source. What distinguishes an audit log entry from other log entries is the `protoPayload` field in the log entry. These logs emulate real-world cloud activity events that capture administrative operations across GCP services such as IAM, Compute Engine, Cloud Storage, BigQuery, and KMS.
 
 ### Google Cloud Audit Log Types
 
