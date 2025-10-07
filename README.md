@@ -19,7 +19,7 @@ The system simulates or consumes live audit events (e.g., AWS CloudTrail, Linux 
 
 `AuditFlow` combines Kafka, Spark, and a modern data warehouse for end-to-end observability.
 
-## Environment Setup
+## 🧩 Environment Setup
 
 Since this is a brand new project, best is to implement everything that we have learnt so far from scratch for practice purposes which includes the setting up of a new VM under a new project from GCP. 
 
