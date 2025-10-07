@@ -44,11 +44,11 @@ A comprehensive guide for setting up a VM instance on GCP can be found in this [
 4. SSH into VM
     - You can ssh using `ssh -i ~/.ssh/audit-flow peter-chettiar@34.126.89.50` 
     - But this is a cumbersome process, so we can setup a config file to make it easier
-```bash
-Host audit-flow
-	 HostName 34.126.140.229
-	 user peter_chettiar
-	 IdentityFile ~/.ssh/audit-flow
-```
-   - If you have multiple projects, make sure you change the active GCP project using the `gcloud` CLI - run `gcloud config set project PROJECT_ID`
-   - Also, it is worth increasing the boot disk space (default given to me was 10GB, not enough to install anaconda on VM) - run `gcloud compute disks resize audit-flow --size=100GB --zone=asia-southeast1-c` to change the boot disk size from 10GB to 100GB
+  	```bash
+	Host audit-flow
+		 HostName 34.126.140.229
+		 user peter_chettiar
+		 IdentityFile ~/.ssh/audit-flow
+	```
+    - If you have multiple projects, make sure you change the active GCP project using the `gcloud` CLI - run `gcloud config set project PROJECT_ID`
+    - Also, it is worth increasing the boot disk space (default given to me was 10GB, not enough to install anaconda on VM) - run `gcloud compute disks resize audit-flow --size=100GB --zone=asia-southeast1-c` to change the boot disk size from 10GB to 100GB
