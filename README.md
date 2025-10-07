@@ -1,9 +1,10 @@
 # AuditFlow
 > Real-time Detection of Privileged Access Anomalies in Streaming Audit Logs
 
-✨ Tagline
+### ✨ Tagline
 
-“Stream. Detect. Protect.”
+**“Stream. Detect. Protect.”**
+
 AuditFlow continuously ingests system and cloud audit logs, identifies unauthorized privileged access, and assigns confidence scores using AI-driven anomaly detection — all in real time.
 
 ## 📊 Overview
