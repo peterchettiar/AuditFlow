@@ -75,6 +75,20 @@ A comprehensive guide for setting up a VM instance on GCP can be found in this [
     - Then git clone the AuditFlow repository.
     - Please note that if you need to install `git` you need to run `sudo apt install -y git` assuming your OS for your VM is "Debian GNU/Linux".
   
+8. Install Docker
+    - Run `sudo apt-get install docker.io` to install docker
+    - Next, we need to add our user to user group in docker so that we don’t need to run docker commands as sudo user:
+        - Run `sudo grouped docker` - create the docker group if it does not exist
+        - Run `sudo usermod -aG docker $USER` to add user into group
+        - Run `newgrp docker` to update the changes made to group
+        - Run `docker run hello-world` to test
+     
+9. Install Docker-Compose
+    - Run `wget https://github.com/docker/compose/releases/download/v2.35.0/docker-compose-linux-x86_64 -O docker-compose` to download the binaries for docker-compose while also changing the output name to docker-compose as well.
+    - Next, we change the output into an executable using `chmod +x docker-compose`
+    - Now to set the `PATH` for the docker-compose executable - in `.bashrc` file insert `export PATH="${HOME}/bin:${PATH}”`, followed by `source .bashrc` for the changes to take effect
+    - Run `docker-compose —-version` to see if the docker-compose command tool works.
+  
 ## 🧾 Dataset: Simulated GCP Audit Logs
 
 This project uses a **synthetic dataset modeled after Google Cloud Platform (GCP) audit logs** as the primary streaming data source. What distinguishes an audit log entry from other log entries is the `protoPayload` field in the log entry. These logs emulate real-world cloud activity events that capture administrative operations across GCP services such as IAM, Compute Engine, Cloud Storage, BigQuery, and KMS.
@@ -131,3 +145,6 @@ The focus is on creating a realistic data pipeline that enables testing of:
 ### Purpose
 This simulation is designed purely for **educational and experimental use**.  
 It serves as a safe, controlled environment to learn how to handle real-world cloud audit data — focusing on the engineering aspects of ingestion, transformation, and analysis — without needing access to actual GCP production environments.
+
+
+
