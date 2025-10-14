@@ -92,7 +92,7 @@ A comprehensive guide for setting up a VM instance on GCP can be found in this [
   
 ## 🧾 Dataset: Simulated GCP Audit Logs
 
-This project uses a **synthetic dataset modeled after Google Cloud Platform (GCP) audit logs** as the primary streaming data source. What distinguishes an audit log entry from other log entries is the `protoPayload` field in the log entry. These logs emulate real-world cloud activity events that capture administrative operations across GCP services such as IAM, Compute Engine, Cloud Storage, BigQuery, and KMS.
+This project uses a **synthetic dataset modelled after Google Cloud Platform (GCP) audit logs** as the primary streaming data source. What distinguishes an audit log entry from other log entries is the `protoPayload` field in the log entry. These logs emulate real-world cloud activity events that capture administrative operations across GCP services such as IAM, Compute Engine, Cloud Storage, BigQuery, and KMS.
 
 ### Google Cloud Audit Log Types
 
@@ -111,10 +111,9 @@ This project uses a **synthetic dataset modeled after Google Cloud Platform (GCP
 
 ### Scope and Simulation Notes
 
-This project aims to simulate Google Cloud audit logs for the purpose of building, testing, and learning from a real-time data engineering pipeline.  
-Because we are generating synthetic data rather than pulling from a live production environment, fully replicating the depth and variability of real-world audit activity presents several challenges — including user diversity, resource complexity, and inter-service dependencies.  
+This project aims to simulate Google Cloud audit logs for the purpose of building, testing, and learning from a real-time data engineering pipeline. Because we are generating synthetic data rather than pulling from a live production environment, fully replicating the depth and variability of real-world audit activity presents several challenges — including user diversity, resource complexity, and inter-service dependencies.  
 
-To keep the simulation focused, we will limit the scope to **Admin Activity** and **Data Access** audit logs, as these two categories most directly reflect user-driven operations and data interactions across GCP services.
+Hence, to keep the simulation focused, we will limit the scope to **Admin Activity** and **Data Access** audit logs, as these two categories most directly reflect user-driven operations and data interactions across GCP services.
 
 ### Targeted GCP Services
 To maintain realism while ensuring the dataset remains lightweight and manageable, we will simulate log events only for **commonly used GCP services**, including:
