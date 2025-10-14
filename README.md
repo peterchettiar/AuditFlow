@@ -12,6 +12,7 @@ AuditFlow continuously ingests system and cloud audit logs, identifies unauthori
 AuditFlow is an open-source data engineering project that integrates **streaming pipelines, cloud audit logs and AI-based scoring** to detect abnormal priviledged access activities.
 
 The system simulates or consumes live audit events (e.g., AWS CloudTrail, Linux auth logs), transforms them into structured datasets, and applies **rule-based + ML** scoring to flag anomalies such as:
+
 	•	Unauthorized logins or sudo usage
 	•	Unexpected admin policy updates
 	•	Key or role creations outside normal hours
