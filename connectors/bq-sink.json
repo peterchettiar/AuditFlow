@@ -1,0 +1,26 @@
+{
+  "connector.class": "com.wepay.kafka.connect.bigquery.BigQuerySinkConnector",
+  "tasks.max": "1",
+  "topics": "gcp-admin-activity",
+
+  "project": "audit-flow-474406",
+  "defaultDataset": "auditflow",
+
+  "keySource": "JSON",
+  "keyfile": "/secrets/gcp/key.json",
+  "enableBatchLoad": "false",
+
+  "autoCreateTables": "true",
+  "sanitizeTopics": "true",
+  "sanitizeFieldNames": "true",
+  "allowNewBigQueryFields": "true",
+  "upsertEnabled": "false",
+
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter.schemas.enable": "false",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+
+  "errors.tolerance": "all",
+  "errors.log.enable": "true",
+  "errors.log.include.messages": "true"
+}

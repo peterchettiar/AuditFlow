@@ -1,0 +1,3 @@
+faker
+orjson
+confluent-kafka

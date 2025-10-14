@@ -1,0 +1,109 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      # Two listeners: one for containers on the Docker network (PLAINTEXT),
+      # and one for clients on your host machine (PLAINTEXT_HOST).
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      # Single-broker safe defaults
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+  redpanda-console:
+    image: redpandadata/console:latest
+    container_name: redpanda-console
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_BROKERS: kafka:29092
+
+  # schema-registry:
+  #   image: confluentinc/cp-schema-registry:7.6.1
+  #   container_name: schema-registry
+  #   depends_on: [kafka]
+  #   ports: ["8082:8081"]
+  #   environment:
+  #     SCHEMA_REGISTRY_HOST_NAME: schema-registry
+  #     SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
+  #     SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+
+  connect:
+    build:
+      context: ./connect   # contains the Dockerfile shown below
+    container_name: connect
+    depends_on: [kafka]
+    ports: ["8083:8083"]  # Kafka Connect REST API
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:29092
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: "connect-cluster"
+      CONNECT_CONFIG_STORAGE_TOPIC: _connect_configs
+      CONNECT_OFFSET_STORAGE_TOPIC: _connect_offsets
+      CONNECT_STATUS_STORAGE_TOPIC: _connect_status
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+
+      # Use JSON values from your current producer; no registry required initially
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+
+      # Plugin path includes BigQuery connector we install via Dockerfile
+      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+
+      # GCP auth for the BigQuery sink (we'll mount a key file below)
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/gcp/key.json
+
+    volumes:
+      - /home/peter_chettiar/.gc/audit-flow-474406-401e676e7ab0.json:/secrets/gcp/key.json:ro   # put your service-account JSON as ./secrets/gcp/key.json
+
+  producer:
+    build:
+      context: ./producer   # directory containing the Dockerfile + your producer.py
+    container_name: auditflow-producer
+    depends_on:
+      - kafka
+    environment:
+      PYTHONUNBUFFERED: "1"
+      KAFKA_BOOTSTRAP: "kafka:29092"         # container-to-container address
+      TOPIC: "gcp-admin-activity"            # override if you use another topic
+      # Optional knobs for your script:
+      MESSAGES_PER_RUN: "100"
+      SLEEP_MS: "200"
+    # If you want hot-reload your local script for dev, uncomment bind mount:
+    # volumes:
+    #   - ./producer:/app
+    restart: on-failure
+
+volumes:
+  kafka-data:
