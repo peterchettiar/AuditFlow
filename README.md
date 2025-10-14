@@ -13,10 +13,10 @@ AuditFlow is an open-source data engineering project that integrates **streaming
 
 The system simulates or consumes live audit events (e.g., AWS CloudTrail, Linux auth logs), transforms them into structured datasets, and applies **rule-based + ML** scoring to flag anomalies such as:
 
-	•	Unauthorized logins or sudo usage
-	•	Unexpected admin policy updates
-	•	Key or role creations outside normal hours
-	•	Access from unfamiliar IPs or regions
+- Unauthorized logins or sudo usage
+- Unexpected admin policy updates
+- Key or role creations outside normal hours
+- Access from unfamiliar IPs or regions
 
 `AuditFlow` combines Kafka, Spark, and a modern data warehouse for end-to-end observability.
 
