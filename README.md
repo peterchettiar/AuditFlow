@@ -142,9 +142,13 @@ The focus is on creating a realistic data pipeline that enables testing of:
 - **Data quality validation and schema enforcement**  
 - **Real-time monitoring and alerting**  
 
-### Purpose
-This simulation is designed purely for **educational and experimental use**.  
-It serves as a safe, controlled environment to learn how to handle real-world cloud audit data — focusing on the engineering aspects of ingestion, transformation, and analysis — without needing access to actual GCP production environments.
+## ⚙️ Methodology - Python Generator
 
+The [producer.py]() script is a synthetic audit-log producer:
+> It _creates fake JSON log events in memory_ and sends (produces) them continuously into a kafka topic called `gcp_audit_logs`
 
+Kafka acts as the streaming backbone - a distributed log (message broker) that stores these events for downstream consumers. So you can think of it like this:
+```txt
+Python generator → Kafka Producer API → Kafka Broker → Topic: gcp_audit_logs → Consumers
+```
 
