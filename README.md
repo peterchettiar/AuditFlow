@@ -165,7 +165,15 @@ from confluent_kafka import Producer
 ```
 
 - Faker : Creates realistic fake data - IPs, user agents, etc.
-- orjson :
-- confluent_kafka.Producer :
+- orjson : Python Library that performs way faster than python native JSON library. Helps with the serialization of python objects (i.e. event dictionary) being generated into JSON data.
+- confluent_kafka.Producer : Putting data into Kafka with a producer. Producers sends a produce request with records to the log, and each record, as it arrives, is given a special number called _offset_, which is a logical position of that record in the log. A _topic_ is simply a logical construct that names the log.
 
-2. 
+> Note: We have to use `confluent-kafka` instead of `kafka_streams` as the latter is a Java library.
+
+<img width="512" height="340" alt="image" src="https://github.com/user-attachments/assets/77d3aeb3-9090-43d2-8e4f-628cb316d8e3" />
+
+2. Kafka Configuration
+
+
+
+3. Define possible event parameters
