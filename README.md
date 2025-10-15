@@ -157,7 +157,7 @@ Python generator → Kafka Producer API → Kafka Broker → Topic: gcp_audit_lo
 ```
 
 Let's do a step-by-step breakdown of the generator script:
-1. Library Setup
+### 1. Library Setup
 ```python
 from faker import Faker
 import orjson as json
@@ -172,8 +172,8 @@ from confluent_kafka import Producer
 
 <img width="512" height="340" alt="image" src="https://github.com/user-attachments/assets/77d3aeb3-9090-43d2-8e4f-628cb316d8e3" />
 
-2. Kafka Configuration
+### 2. Kafka Configuration
 
 
 
-3. Define possible event parameters
+### 3. Define possible event parameters
