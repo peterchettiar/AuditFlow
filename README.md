@@ -96,6 +96,8 @@ This project uses a **synthetic dataset modelled after Google Cloud Platform (GC
 
 ### Google Cloud Audit Log Types
 
+The different types of audit logs are as follows:
+
 | **Log Type** | **Triggered By** | **Configurable** | **Default State** | **Example Use Case** | **Key Notes** |
 |---------------|------------------|------------------|-------------------|----------------------|----------------|
 | **Admin Activity** | User-driven configuration or metadata changes | ❌ No | ✅ Always enabled | Creating or deleting VM instances, updating IAM permissions | Logs persist even if the Cloud Logging API is disabled |
@@ -113,7 +115,7 @@ This project uses a **synthetic dataset modelled after Google Cloud Platform (GC
 
 This project aims to simulate Google Cloud audit logs for the purpose of building, testing, and learning from a real-time data engineering pipeline. Because we are generating synthetic data rather than pulling from a live production environment, fully replicating the depth and variability of real-world audit activity presents several challenges — including user diversity, resource complexity, and inter-service dependencies.  
 
-Hence, to keep the simulation focused, we will limit the scope to **Admin Activity** and **Data Access** audit logs, as these two categories most directly reflect user-driven operations and data interactions across GCP services.
+Hence, to keep the simulation focused, we will limit the scope to **Admin Activity** audit logs, as it is the category of audit logs that most directly reflect user-driven operations and data interactions across GCP services.
 
 ### Targeted GCP Services
 To maintain realism while ensuring the dataset remains lightweight and manageable, we will simulate log events only for **commonly used GCP services**, including:
@@ -125,7 +127,9 @@ The simulation will emulate audit log activity for a select set of commonly used
 | **BigQuery** | Analytical data operations | `bigquery.jobs.query`, `bigquery.tables.get`, `bigquery.datasets.create` |
 | **Cloud IAM** | Identity and access management | `iam.roles.create`, `iam.serviceAccounts.update`, `setIamPolicy` |
 
-These services collectively cover the most common admin and data-related activities in a Google Cloud environment, providing a realistic yet manageable simulation scope.
+These services collectively cover the most common admin-related activities in a Google Cloud environment, providing a realistic yet manageable simulation scope. The services mentioned above are not exhaustive, and there would be more service methods that would be included in the data simulation script. Also, the following is a real-life example of a admin activity audit log (ideally this is what we want to achieve!):
+
+<img width="498" height="536" alt="image" src="https://github.com/user-attachments/assets/b6a62327-8bf8-4367-96aa-f2c7913e33c9" />
 
 ### Simulation Design
 The simulation will generate log events that loosely follow Google Cloud’s [audit log format]([https://cloud.google.com/logging/docs/audit](https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog)) with key fields such as:
@@ -152,3 +156,16 @@ Kafka acts as the streaming backbone - a distributed log (message broker) that s
 Python generator → Kafka Producer API → Kafka Broker → Topic: gcp_audit_logs → Consumers
 ```
 
+Let's do a step-by-step breakdown of the generator script:
+1. Library Setup
+```python
+from faker import Faker
+import orjson as json
+from confluent_kafka import Producer
+```
+
+- Faker : Creates realistic fake data - IPs, user agents, etc.
+- orjson :
+- confluent_kafka.Producer :
+
+2. 
