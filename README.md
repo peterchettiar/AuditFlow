@@ -170,10 +170,38 @@ from confluent_kafka import Producer
 
 > Note: We have to use `confluent-kafka` instead of `kafka_streams` as the latter is a Java library.
 
+>[!IMPORTANT]
+>For those who are new to Kafka, it is a distributed streaming platform that provides a publish-subscribe messaging system. And producers are responsible for publishing messages to a kafka topic.
+
 <img width="512" height="340" alt="image" src="https://github.com/user-attachments/assets/77d3aeb3-9090-43d2-8e4f-628cb316d8e3" />
 
 ### 2. Kafka Configuration
 
+```python
+BROKER = "kafka:29092"
+TOPIC = "gcp_admin_audit_logs"
+p = Producer({
+    "bootstrap.servers": BROKER,
+    "client.id": socket.gethostname(),
+    "enable.idempotence": False,
+    "acks":"1"
+})
+```
 
+Essentially what we are trying to do is to pass a dictionary of configurations as argument to the `Producer` API. For a full list and description of the various configurations available for the `Producer` API, please see [here](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html).
+
+The following is a quick summary of a typical process of publishing events to Kafka topic in the kafka cluster via the `Producer` API:
+1. Each message being sent to kafka has three elements: Timestamp, Key and Value to form a `ProducerRecord()`
+2. `Producer` API then serializes the event/record into stream of bytes.
+3. Producer first computes hash on the key of the message followed by a mod operation to find the partition to produce to in the kafka topic
+4. Kafka topic is partitioned based on Key, and message is added to the respective partition - these partitions help kafka scale by allowing you to add resources and additional partitions as your system handles more and more data.
+5. Each partition resides in a kafka broker. And each partition has a `Leader` node handling all its read and write requests. `Follower` node hold replicated data of `Leader` nodes enabling fault tolerance in case of data loss. A new leader is elected from the followers if the broker goes down.
+6. After the messsge is delivered to cluster, producer waits for an ackowledgement from the leader node that it did indeed receive the data. This `acks` setting ensures no data loss and and can be customised in such a way that `Follower` nodes acknowledge as well. But this process results in high latency, as such we can specify `acks=0` for no acknowledgment needed for producer which ensures lowest latency.
+
+I have used the following producer configuration parameters:
+1. `bootstrap.servers` - At a minimum, this parameter should be set as config. It is simply a host/port pair where more often than not is actually a list (e.g. `host1:port1,host2:port2,...`). This list is used to establish the initial connection to the kafka cluster. The Producer API (client application) uses this list to bootstrap and discover the full set of kafka brokers in our cluster (i.e. our kafka cluster can have more than a 100 brokers, hence by specifying a few in our server list our client can initialise a connection to any one of them as a starting point and proceed to discover other brokers in the cluster - clients, producer or consumer APIs, make use of all the servers irrespective of which servers are specified in bootstrap configuration). `BROKER = kafka:29092` - we have spinned up the kafka clusters using docker and hence hostname would be the container name in this case
+2. `client.id` - An id string to pass to the server when making requests. The purpose of this is to be able to track the source of requests beyond just ip/port by allowing a logical application name to be included to server-side request logging.
+3. `enable.idempotence` - When set to ‘true’, the producer will ensure that exactly one copy of each message is written in the stream. If ‘false’, producer retries due to broker failures, etc., may write duplicates of the retried message in the stream.
+4. `acks":"1` - 
 
 ### 3. Define possible event parameters
