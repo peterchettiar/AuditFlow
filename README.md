@@ -192,16 +192,18 @@ Essentially what we are trying to do is to pass a dictionary of configurations a
 
 The following is a quick summary of a typical process of publishing events to Kafka topic in the kafka cluster via the `Producer` API:
 1. Each message being sent to kafka has three elements: Timestamp, Key and Value to form a `ProducerRecord()`
-2. `Producer` API then serializes the event/record into stream of bytes.
-3. Producer first computes hash on the key of the message followed by a mod operation to find the partition to produce to in the kafka topic
+2. `Producer` API uses your configured `key.serializer` and `value.serializer` to turn key/value into bytes.
+3. Producer first computes hash on the key of the message followed by a mod operation to find the partition to produce to into topics first in the `Producer` API first before sending to the same partition in the Kafka topic in batches. This batching mechanism minimises overheads and improves network communication efficiency.
 4. Kafka topic is partitioned based on Key, and message is added to the respective partition - these partitions help kafka scale by allowing you to add resources and additional partitions as your system handles more and more data.
 5. Each partition resides in a kafka broker. And each partition has a `Leader` node handling all its read and write requests. `Follower` node hold replicated data of `Leader` nodes enabling fault tolerance in case of data loss. A new leader is elected from the followers if the broker goes down.
 6. After the messsge is delivered to cluster, producer waits for an ackowledgement from the leader node that it did indeed receive the data. This `acks` setting ensures no data loss and and can be customised in such a way that `Follower` nodes acknowledge as well. But this process results in high latency, as such we can specify `acks=0` for no acknowledgment needed for producer which ensures lowest latency.
+
+<img width="640" height="360" alt="image" src="https://github.com/user-attachments/assets/7c900158-031c-41e1-a6d8-f1aa67cd3055" />
 
 I have used the following producer configuration parameters:
 1. `bootstrap.servers` - At a minimum, this parameter should be set as config. It is simply a host/port pair where more often than not is actually a list (e.g. `host1:port1,host2:port2,...`). This list is used to establish the initial connection to the kafka cluster. The Producer API (client application) uses this list to bootstrap and discover the full set of kafka brokers in our cluster (i.e. our kafka cluster can have more than a 100 brokers, hence by specifying a few in our server list our client can initialise a connection to any one of them as a starting point and proceed to discover other brokers in the cluster - clients, producer or consumer APIs, make use of all the servers irrespective of which servers are specified in bootstrap configuration). `BROKER = kafka:29092` - we have spinned up the kafka clusters using docker and hence hostname would be the container name in this case
 2. `client.id` - An id string to pass to the server when making requests. The purpose of this is to be able to track the source of requests beyond just ip/port by allowing a logical application name to be included to server-side request logging.
 3. `enable.idempotence` - When set to ‘true’, the producer will ensure that exactly one copy of each message is written in the stream. If ‘false’, producer retries due to broker failures, etc., may write duplicates of the retried message in the stream.
-4. `acks":"1` - 
+4. `acks":"1` - The producer waits for an acknowledgement from leader partition after sending the record. Once the leader partition acknowledges the record, the producer considers it successfully written.
 
 ### 3. Define possible event parameters
