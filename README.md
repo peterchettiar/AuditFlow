@@ -209,3 +209,43 @@ I have used the following producer configuration parameters:
 4. `acks":"1` - The producer waits for an acknowledgement from leader partition after sending the record. Once the leader partition acknowledges the record, the producer considers it successfully written.
 
 ### 3. Define possible event parameters
+
+The following are lookup tables for randomizing realistic values in each log:
+
+1. Service Methods - Google Cloud services that write admin activity logs and the various methods for [ADMIN_WRITE](https://docs.cloud.google.com/compute/docs/logging/audit-logging#permission-type).
+
+```python
+SERVICES_METHODS = {
+    "iam.googleapis.com": [
+        "SetIamPolicy",
+        "CreateServiceAccount",
+        "DeleteServiceAccount",
+        "UndeleteServiceAccount",
+        "UpdateServiceAccount",
+        "CreateRole",
+        "UpdateRole",
+        "DeleteRole",
+        "GrantServiceAccountKey",
+    ],
+    "compute.googleapis.com": [
+        "v1.compute.instances.insert",
+        "v1.compute.instances.delete",
+        "v1.compute.instances.setMetadata",
+        "v1.compute.disks.createSnapshot",
+        "v1.compute.firewalls.insert",
+        "v1.compute.firewalls.patch",
+    ], ...
+```
+
+2. Severities - The severity of the event described in the log entry, expressed as one of the standard severity levels listed below.
+
+| Enums | Description |
+| `DEFAULT` | 	(0) The log entry has no assigned severity level. |
+| `DEBUG` | (100) Debug or trace information. |
+| `INFO` | 	(200) Routine information, such as ongoing status or performance. |
+| `NOTICE` | (300) Normal but significant events, such as start up, shut down, or a configuration change. |
+| `WARNING` | (400) Warning events might cause problems. |
+| `ERROR` | (500) Error events are likely to cause problems. |
+| `CRITICAL` | (600) Critical events cause more severe problems or outages. |
+| `ALERT` | (700) A person must take an action immediately. |
+| `EMERGENCY` | (800) One or more systems are unusable. |
