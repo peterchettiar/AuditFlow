@@ -250,3 +250,15 @@ SERVICES_METHODS = {
 | `CRITICAL` | (600) Critical events cause more severe problems or outages. |
 | `ALERT` | (700) A person must take an action immediately. |
 | `EMERGENCY` | (800) One or more systems are unusable. |
+
+For the scope of this project, I've only defined the following:
+```python
+SEVERITIES = ["INFO", "NOTICE", "WARNING", "ERROR"]
+```
+
+Similarly, for `STATUS_CODES`, I've defined it as a list - `[(0, "OK"), (7, "PERMISSION_DENIED"), (5, "NOT_FOUND"), (8, "RESOURCE_EXHAUSTED")]`. But this is by no means the full complete list. For that, you can find it in this [repository](https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto).
+
+`STATUS_WEIGHTS` and `SEVERITY_WEIGHTS` are weights that are mapped to the respective elements in the `STATUS_CODES` and `SEVERITIES` lists respectively. I believe that this step is rather straight-forward explanation. We just want to mimic a production sort of environment where most of the events logged are not critical in nature and are just informative.
+
+### 4. Event Generation
+
