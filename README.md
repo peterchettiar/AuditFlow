@@ -190,7 +190,7 @@ p = Producer({
 
 Essentially what we are trying to do is to pass a dictionary of configurations as argument to the `Producer` API. For a full list and description of the various configurations available for the `Producer` API, please see [here](https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html).
 
->[!IMPORTANT]
+>[!SUMMARY]
 >The following is a quick summary of a typical process of publishing events to Kafka topic in the kafka cluster via the `Producer` API:
 > 1. Each message being sent to kafka has three elements: Timestamp, Key and Value to form a `ProducerRecord()`
 > 2. `Producer` API uses your configured `key.serializer` and `value.serializer` to turn key/value into bytes.
