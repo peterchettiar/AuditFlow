@@ -148,7 +148,7 @@ The focus is on creating a realistic data pipeline that enables testing of:
 
 ## ⚙️ Methodology - Python Generator
 
-The [producer.py]() script is a synthetic audit-log producer:
+The [producer.py](https://github.com/peterchettiar/AuditFlow/blob/main/producer/producer.py) script is a synthetic audit-log producer:
 > It _creates fake JSON log events in memory_ and sends (produces) them continuously into a kafka topic called `gcp_audit_logs`
 
 Kafka acts as the streaming backbone - a distributed log (message broker) that stores these events for downstream consumers. So you can think of it like this:
@@ -199,6 +199,7 @@ The following is a quick summary of a typical process of publishing events to Ka
 6. After the messsge is delivered to cluster, producer waits for an ackowledgement from the leader node that it did indeed receive the data. This `acks` setting ensures no data loss and and can be customised in such a way that `Follower` nodes acknowledge as well. But this process results in high latency, as such we can specify `acks=0` for no acknowledgment needed for producer which ensures lowest latency.
 
 <img width="640" height="360" alt="image" src="https://github.com/user-attachments/assets/7c900158-031c-41e1-a6d8-f1aa67cd3055" />
+
 
 I have used the following producer configuration parameters:
 1. `bootstrap.servers` - At a minimum, this parameter should be set as config. It is simply a host/port pair where more often than not is actually a list (e.g. `host1:port1,host2:port2,...`). This list is used to establish the initial connection to the kafka cluster. The Producer API (client application) uses this list to bootstrap and discover the full set of kafka brokers in our cluster (i.e. our kafka cluster can have more than a 100 brokers, hence by specifying a few in our server list our client can initialise a connection to any one of them as a starting point and proceed to discover other brokers in the cluster - clients, producer or consumer APIs, make use of all the servers irrespective of which servers are specified in bootstrap configuration). `BROKER = kafka:29092` - we have spinned up the kafka clusters using docker and hence hostname would be the container name in this case
