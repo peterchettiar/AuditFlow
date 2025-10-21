@@ -240,6 +240,7 @@ SERVICES_METHODS = {
 2. Severities - The severity of the event described in the log entry, expressed as one of the standard severity levels listed below.
 
 | Enums | Description |
+|-------|-------------|
 | `DEFAULT` | 	(0) The log entry has no assigned severity level. |
 | `DEBUG` | (100) Debug or trace information. |
 | `INFO` | 	(200) Routine information, such as ongoing status or performance. |
