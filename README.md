@@ -262,3 +262,111 @@ Similarly, for `STATUS_CODES`, I've defined it as a list - `[(0, "OK"), (7, "PER
 
 ### 4. Event Generation
 
+The last component of the python script is the main function called `run()` in which the event is being generated in the most realistic way (I tried my best to mimic a live logger) and sent to the kafka topic. It's packed with a lot of helper functions, hence let's take a look at it one step at a time. 
+
+The overall `run()` function looks like this:
+```python
+def run(rate_per_sec: int = 300, jitter: bool = True, bursty: bool = True):
+    """
+    rate_per_sec: base send rate
+    jitter: randomize inter-message sleep
+    bursty: occasionally send mini-bursts
+    """
+    base_interval = 1.0 / max(rate_per_sec, 1)
+    last_burst = time.time()
+    while True:
+        # Occasional burst every ~20–40 seconds
+        burst = 1
+        if bursty and time.time() - last_burst > random.uniform(20, 40):
+            burst = random.randint(20, 100)
+            last_burst = time.time()
+
+        # Diurnal modulation
+        mod = diurnal_weight()
+        interval = base_interval / max(0.1, mod)
+
+        for _ in range(burst):
+            event, key = make_admin_activity_event()
+            p.produce(
+                TOPIC,
+                key=key.encode(),
+                value=json.dumps(event),
+                on_delivery=delivery,
+            )
+            p.poll(0.5)
+
+            sleep_for = interval * (random.uniform(0.5, 1.6) if jitter else 1.0)
+            time.sleep(sleep_for)
+```
+
+There are three main parts to the function, let's break it down:
+1. **Rate Control Setup**
+
+```python
+base_interval = 1.0 / max(rate_per_sec, 1)
+last_burst = time.time()
+```
+- `rate_per_sec` : defines the baseline message rate (e.g. 300 events per second)
+- `base_interval` : the average time between two messages
+- `last_burst` : timestamp used to track when the last "burst" happened
+
+  > Note: We want to mimic real world load variation, hence we use the variable `burst` to send 20 to 100 messages every 20 to 40 seconds else just one event being sent. In situations like deployments, batch jobs or spike in activity there would be a suddent burst of logs, hence having these steps included would be realistic. Details of how it is being integrated into the function would be described in the next section.
+
+2. **Traffic Pattern Logic (outer while-loop)**
+
+```python
+while True:
+	# Occasional burst every ~20–40 seconds
+	burst = 1
+	if bursty and time.time() - last_burst > random.uniform(20, 40):
+		burst = random.randint(20, 100)
+		last_burst = time.time()
+
+	# Diurnal modulation
+	mod = diurnal_weight()
+	interval = base_interval / max(0.1, mod)
+```
+
+a. Bursty Traffic
+	- Every 20 to 40 seconds, the generator sends a short burst of 20-100 events rapidly.
+	- Mimics real cloud systems that have sudden bursts of logs (e.g., deployments, batch jobs, spikes in activity).
+
+b. Diurnal Modulation
+	- calls `diurnal_weight()` function to scale interval based on the time of day. Essentially we want to create/generate more events per second during peak hours and lesser rate during non-peak hours.
+	- Hence, between 7am to 12pm as well as 8pm to 2am was arbitrarily selected as the peak hours of the day.
+	- If it’s a busy hour, mod ≈ 1.0 → short intervals → more events/sec.
+
+3. **Message Production Loop (inner for-loop)**
+
+```python
+for _ in range(burst):
+	event, key = make_admin_activity_event()
+	p.produce(
+		TOPIC,
+		key=key.encode(),
+		value=json.dumps(event),
+		callback=delivery,
+	)
+	p.poll(0.5)
+	
+	sleep_for = interval * (random.uniform(0.5, 1.6) if jitter else 1.0)
+	time.sleep(sleep_for)
+```
+
+a. Create a new log
+	- `make_admin_activity_event()` builds a full JSON record representing one simulated GCP admin activity audit log.
+ 	- `key` (the user email) ensure the kafka messages with the same user go to the same partition.
+
+b. Send it to Kafka
+	- `p.produce(...)` sends the JSON message to the Kafka topic (gcp_admin_audit_logs).
+	- `p.poll(0.5)` serves internal callbacks (e.g., delivery reports).
+
+>[!TIP]
+>For asynchronous writes, in the produce method we can pass a parameter `callback` if we want to receive notification of delivery success or failure of messge to kafka broker. We pass a function here as it needs to be a callable object, and delivery notification events will only be propogated if `poll()` is invoked. We pass in an argument to `poll()` as a timeout value (i.e. to wait 0.5 milliseconds for a record before returning).
+
+c. Control the timing
+	- `sleep_for`: randomizes the pause between sends (via jitter), so the timing isn’t perfectly uniform.
+	- If `jitter=True`: small random variation between `0.5×` and `1.6×` the interval.
+	- If `jitter=False`: constant interval.
+
+So, this inner loop controls the micro-level timing between individual events.
