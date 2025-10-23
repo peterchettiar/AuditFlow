@@ -370,3 +370,7 @@ c. Control the timing
 	- If `jitter=False`: constant interval.
 
 So, this inner loop controls the micro-level timing between individual events.
+
+## ⚙️ Methodology - Docker Compose
+
+Now that we have our `producer.py` file out of the way, we now need to spin up the necessary services via docker to be able to send the generated event/messages to the kafka topic as well as be able to view the data via a user interface. As such, we would need to build three containers; a Kafka container, redpanda container which is a kafka web UI for visibility of our topic as well as exploring real-time data, and lastly a python container that runs our python script and sends messages to kafka.
