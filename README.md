@@ -381,26 +381,26 @@ As mentioned we need a `kafka container` which serves as an endpoint for the mes
 
 ```yaml
 broker:
-	image: confluentinc/confluent-local:latest
-	hostname: broker
-	container_name: broker
-	ports:
-	  - "9092:9092"
-	environment:
-	  KAFKA_NODE_ID: 1
-	  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
-	  KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092'
-	  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-	  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-	  KAFKA_PROCESS_ROLES: 'broker,controller'
-	  KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
-	  KAFKA_LISTENERS: 'PLAINTEXT://broker:29092,CONTROLLER://broker:29093'
-	  KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-	  KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-	  KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+  image: confluentinc/confluent-local:latest
+  hostname: broker
+  container_name: broker
+  ports:
+    - "9092:9092"
+  environment:
+    KAFKA_NODE_ID: 1
+    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
+    KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092'
+    KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    KAFKA_PROCESS_ROLES: 'broker,controller'
+    KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
+    KAFKA_LISTENERS: 'PLAINTEXT://broker:29092,CONTROLLER://broker:29093'
+    KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+    KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+    KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
 	
-	volumes:
-	  - kafka-data:/var/lib/kafka/data
+  volumes:
+    - kafka-data:/var/lib/kafka/data
 ```
 
 The above is extracted from a [confluent-local](https://github.com/confluentinc/kafka-images/blob/master/examples/confluent-local/docker-compose.yml) docker-compose example file. I've just made a few tweaks to make it more suitable for my experiment and to be honest, most of the environment variables do not have to be listed as they hold the default values. Literally all the variables except for `CLUSTER_ID` is listed. I did so, so as to be able to describe what they are meant to do so that you can decide if you want to change the values based on your experiment. The list of environment variables and default values can be found [here]([local/include/etc/confluent/docker/configureDefaults](https://github.com/confluentinc/kafka-images/blob/7.4.x/local/include/etc/confluent/docker/configureDefaults?session_ref=https%3A%2F%2Fgithub.com%2F&url_ref=https%3A%2F%2Fdocs.confluent.io%2Fplatform%2Fcurrent%2Finstallation%2Fdocker%2Fconfig-reference.html).
