@@ -398,7 +398,6 @@ broker:
     KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
     KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
     KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-	
   volumes:
     - kafka-data:/var/lib/kafka/data
 ```
@@ -410,6 +409,7 @@ The above is extracted from a [confluent-local](https://github.com/confluentinc/
 3. `KAFKA_ADVERTISED_LISTENERS` : A list of listeners with their host/IP and port. This is the metadata that is passed back to clients (producers/consumers). Kafka brokers include their address (hostname + port) in metadata responses. Clients use that to reconnect or to reach the correct partition leader. 
 4. `KAFKA_TRANSACTION_STATE_LOG_MIN_ISR` : The minimum number of replicas that must acknowledge a write to transaction topic in order to be considered successful.
 5. `KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR` : The replication factor for the transaction topic (set higher to ensure availability). Internal topic creation will fail until the cluster size meets this replication factor requirement.
-> Note: The transaction topic is a internal kafka log called `__transaction_state` that logs all ongoing transactional metadata such as Transaction Status (e.g. `ONGOING`, `PREPARE_COMMIT`, `COMPLETE_COMMIT`, `ABORTED`, etc.).  This is to ensure idempotency by enabling atomic writes to partitions from producers. Hence, the default `KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR` is 3 (i.e. one leader node and 2 replica nodes) to ensure that this `__transaction_state` log is not lost, but since we are using a single-node cluster, we have to change this value to 1. 
+>[!TIP]
+>The transaction topic is a internal kafka log called `__transaction_state` that logs all ongoing transactional metadata such as Transaction Status (e.g. `ONGOING`, `PREPARE_COMMIT`, `COMPLETE_COMMIT`, `ABORTED`, etc.).  This is to ensure idempotency by enabling atomic writes to partitions from producers. Hence, the default `KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR` is 3 (i.e. one leader node and 2 replica nodes) to ensure that this `__transaction_state` log is not lost, but since we are using a single-node cluster, we have to change this value to 1. 
 6. 
 7. 
