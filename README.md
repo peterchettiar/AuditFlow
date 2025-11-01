@@ -164,9 +164,9 @@ import orjson as json
 from confluent_kafka import Producer
 ```
 
-- Faker : Creates realistic fake data - IPs, user agents, etc.
-- orjson : Python Library that performs way faster than python native JSON library. Helps with the serialization of python objects (i.e. event dictionary) being generated into JSON data.
-- confluent_kafka.Producer : Putting data into Kafka with a producer. Producers sends a produce request with records to the log, and each record, as it arrives, is given a special number called _offset_, which is a logical position of that record in the log. A _topic_ is simply a logical construct that names the log.
+- `Faker` : Creates realistic fake data - IPs, user agents, etc.
+- `orjson` : Python Library that performs way faster than python native JSON library. Helps with the serialization of python objects (i.e. event dictionary) being generated into JSON data.
+- `confluent_kafka.Producer` : Putting data into Kafka with a producer. Producers sends a produce request with records to the log, and each record, as it arrives, is given a special number called _offset_, which is a logical position of that record in the log. A _topic_ is simply a logical construct that names the log.
 
 > Note: We have to use `confluent-kafka` instead of `kafka_streams` as the latter is a Java library.
 
@@ -404,12 +404,12 @@ broker:
 
 The above is extracted from a [confluent-local](https://github.com/confluentinc/kafka-images/blob/master/examples/confluent-local/docker-compose.yml) docker-compose example file. I've just made a few tweaks to make it more suitable for my experiment and to be honest, most of the environment variables do not have to be listed as they hold the default values. Literally all the variables except for `CLUSTER_ID` is listed. I did so, so as to be able to describe what they are meant to do so that you can decide if you want to change the values based on your experiment. The list of environment variables and default values can be found [here]([local/include/etc/confluent/docker/configureDefaults](https://github.com/confluentinc/kafka-images/blob/7.4.x/local/include/etc/confluent/docker/configureDefaults?session_ref=https%3A%2F%2Fgithub.com%2F&url_ref=https%3A%2F%2Fdocs.confluent.io%2Fplatform%2Fcurrent%2Finstallation%2Fdocker%2Fconfig-reference.html).
 
-1. `KAFKA_NODE_ID`
+1. `KAFKA_NODE_ID` : The node ID associated with the roles this process is playing when `KAFKA_PROCESS_ROLES` is non-empty. This is required configuration when running in `KRaft` mode.
 2. `KAFKA_LISTENER_SECURITY_PROTOCOL_MAP` : Defines key/value pairs for the security protocol to use, per listener name. In the docker-compose file we had defined `KAFKA_LISTENERS` which is essentially just labels mapped to a port. And the security protocol used in this case is `PLAINTEXT` which simply refers to an unsecured security type.
 3. `KAFKA_ADVERTISED_LISTENERS` : A list of listeners with their host/IP and port. This is the metadata that is passed back to clients (producers/consumers). Kafka brokers include their address (hostname + port) in metadata responses. Clients use that to reconnect or to reach the correct partition leader. 
 4. `KAFKA_TRANSACTION_STATE_LOG_MIN_ISR` : The minimum number of replicas that must acknowledge a write to transaction topic in order to be considered successful.
 5. `KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR` : The replication factor for the transaction topic (set higher to ensure availability). Internal topic creation will fail until the cluster size meets this replication factor requirement.
 >[!TIP]
->The transaction topic is an internal kafka log called `__transaction_state` that logs all ongoing transactional metadata such as Transaction Status (e.g. `ONGOING`, `PREPARE_COMMIT`, `COMPLETE_COMMIT`, `ABORTED`, etc.).  This is to ensure idempotency by enabling atomic writes to partitions from producers. Hence, the default `KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR` is 3 (i.e. one leader node and 2 replica nodes) to ensure that this `__transaction_state` log is not lost, but since we are using a single-node cluster, we have to change this value to 1. 
-6. `KAFKA_PROCESS_ROLES`
+>The transaction topic is an internal kafka log called `__transaction_state` that logs all ongoing transactional metadata such as Transaction Status (e.g. `ONGOING`, `PREPARE_COMMIT`, `COMPLETE_COMMIT`, `ABORTED`, etc.).  This is to ensure idempotency by enabling atomic writes to partitions from producers. Hence, the default `KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR` is 3 (i.e. one leader node and 2 replica nodes) to ensure that this `__transaction_state` log is not lost, but since we are using a single-node cluster, we have to change this value to 1. Technically for this version of kafka (i.e. confluent-local) the default value for `KAFKA_TRANSACTION_STATE_LOG_MIN_ISR` and `KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR` is 1 and so we don't have to actually include this for our purpose but thought it would be nice to include.
+6. `KAFKA_PROCESS_ROLES` : 
 7. `KAFKA_CONTROLLER_QUORUM_VOTERS`
